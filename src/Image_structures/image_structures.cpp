@@ -592,7 +592,38 @@ imageDataType calculate_residual(nTupleImage *imgIn, nTupleImage *imgInPrevious,
 	return( residual/( (imageDataType)sumOcc));
 }
 
+nTupleImage *concateTupleImage(std::initializer_list<nTupleImage*> images) {
+  // Sum all the channels size
+  auto nTupleSize = 0;
+  for (auto img : images) {
+    nTupleSize += img->nTupleSize;
+  }
+  // Assume that the spatial sizes are the same as well as patch size and indexing
+  auto first = *images.begin();
+  nTupleImage *imgOut = new nTupleImage(first->xSize, first->ySize, nTupleSize, first->patchSizeX, first->patchSizeY, first->indexing);
 
+  auto channel = 0;
+  for(auto img: images) {
+    for (int x=0; x< (int)imgOut->xSize; x++)
+      for (int y=0; y< (int)imgOut->ySize; y++)
+	for (int c=0; c< (int)img->nTupleSize; c++)
+	  imgOut->set_value(x,y,c+channel,img->get_value(x,y,c));
+    
+    channel += img->nTupleSize;
+  }
+  return imgOut;
+}
 
-
-
+void splitTupleImage(nTupleImage *imgOut,
+                     std::initializer_list<nTupleImage *> images) {
+  // Assume that everything is correct (ntupleSize, spatialsize, etc)
+  
+  auto channel = 0;
+  for(auto img: images) {
+    for (int x=0; x< (int)img->xSize; x++)
+      for (int y=0; y< (int)img->ySize; y++)
+	for (int c=0; c< (int)img->nTupleSize; c++)
+	  img->set_value(x,y,c,imgOut->get_value(x,y,c+channel));
+    channel += img->nTupleSize;
+  }
+}

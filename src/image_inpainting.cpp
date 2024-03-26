@@ -13,6 +13,9 @@
 
 #include "image_inpainting.h"
 
+std::string concat(const char *s1, const char *s2) {
+  return std::string(s1) + std::string(s2);
+}
 patchMatchParameterStruct * initialise_patch_match_parameters(
 	int patchSizeX, int patchSizeY, int imgSizeX, int imgSizeY, bool verboseMode)
 {
@@ -123,7 +126,7 @@ float * inpaint_image_wrapper(float *inputImage, int nx, int ny, int nc,
 	return(imgOut->get_data_ptr());
 }
 
-void inpaint_image_wrapper(const char *fileIn,const char *fileOccIn, const char *fileOut,
+void inpaint_image_wrapper(const char *folderIn, const char *folderOut,
 			int patchSizeX, int patchSizeY, int nLevels, bool useFeatures, bool verboseMode)
 {
 
@@ -133,14 +136,25 @@ void inpaint_image_wrapper(const char *fileIn,const char *fileOccIn, const char 
 	//read input image
 	size_t nx,ny,nc;
 	size_t nOccX,nOccY,nOccC;
+
+	// Read all images in materials: diffuse, normals, roughness, specular
+	// Let's hope that all these images are of the same size, we don't check
+	printf("Reading input images\n");
+	float *diffuse = read_image(concat(folderIn, "/diffuse.png"), &nx,&ny,&nc);
+	nTupleImage *diffuseIn = new nTupleImage(nx,ny,nc,patchSizeX,patchSizeY,IMAGE_INDEXING,diffuse);
+
+	float *normal = read_image(concat(folderIn, "/normal.png"), &nx,&ny,&nc);
+	nTupleImage *normalIn = new nTupleImage(nx,ny,nc,patchSizeX,patchSizeY,IMAGE_INDEXING,normal);
 	
-	//read input image
-	printf("Reading input image\n");
-	float *inputImage = read_image(fileIn,&nx,&ny,&nc);
+	float *roughness = read_image(concat(folderIn, "/roughness.png"), &nx,&ny,&nc);
+	nTupleImage *roughnessIn = new nTupleImage(nx,ny,nc,patchSizeX,patchSizeY,IMAGE_INDEXING,roughness);
 	
+	float *specular = read_image(concat(folderIn, "/specular.png"), &nx,&ny,&nc);
+	nTupleImage *specularIn = new nTupleImage(nx,ny,nc,patchSizeX,patchSizeY,IMAGE_INDEXING,specular);
+
 	//read input occlusion
 	printf("Reading input occlusion\n");
-	float *inputOcc = read_image(fileOccIn,&nOccX,&nOccY,&nOccC);
+	float *inputOcc = read_image(concat(folderIn, "/mask.png"),&nOccX,&nOccY,&nOccC);
 	
 	// ****************************************** //
 	// **** INITIALISE PATCHMATCH PARAMETERS **** //
@@ -159,8 +173,6 @@ void inpaint_image_wrapper(const char *fileIn,const char *fileOccIn, const char 
 	// ******************************** //
 	// ***** CREATE IMAGE STRUCTURES*** //
 	// ******************************** //
-
-	nTupleImage *imgIn = new nTupleImage(nx,ny,nc,patchSizeX,patchSizeY,IMAGE_INDEXING,inputImage);
 	nTupleImage *occIn;
 	if (nOccC == 3)		//if we need to convert the input occlusion
 	{
@@ -175,11 +187,18 @@ void inpaint_image_wrapper(const char *fileIn,const char *fileOccIn, const char 
 	occIn->display_attributes();
 	// ***** CALL MAIN ROUTINE **** //
 
-	nTupleImage * imgOut = inpaint_image(imgIn, occIn, patchMatchParams, inpaintingParams);
+	// Concatenate all the channels together for the material
+	nTupleImage *materialIn = concateTupleImage({diffuseIn, normalIn, roughnessIn, specularIn});
+	std::cout << "Number of channels " << materialIn->nTupleSize << std::endl;
+	nTupleImage * imgOut = inpaint_image(materialIn, occIn, patchMatchParams, inpaintingParams);
 
-	//write output
-	//write_image(imgOut,fileOut,255);
-	write_image(imgOut,fileOut);
+	// Need to split again the material
+	splitTupleImage(imgOut, {diffuseIn, normalIn, roughnessIn, specularIn});
+
+	write_image(diffuseIn, concat(folderOut, "/diffuse.png"));
+	write_image(normalIn, concat(folderOut, "/normal.png"));
+	write_image(roughnessIn, concat(folderOut, "/roughness.png"));
+	write_image(specularIn, concat(folderOut, "/specular.png"));
 
 	delete imgOut;
 }

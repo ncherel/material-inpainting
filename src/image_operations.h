@@ -19,8 +19,8 @@ void seed_random_numbers( double inputSeed=0.0);
 nTupleImage *make_colour_wheel();
 
 //reading and writing functions
-float * read_image(const char *fileIn, size_t *nx, size_t *ny, size_t *nc);
-void write_image(nTupleImage *imgIn, const char *fileName, imageDataType normalisationScalar=0);
+float * read_image(std::string fileIn, size_t *nx, size_t *ny, size_t *nc);
+void write_image(nTupleImage *imgIn, std::string fileName, imageDataType normalisationScalar=0);
 void write_image_pyramid(nTupleImagePyramid imgInPyramid, int nLevels, const char *fileName, imageDataType normalisationScalar=0);
 void write_shift_map(nTupleImage *shiftMap, const char *fileName);
 

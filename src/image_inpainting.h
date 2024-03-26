@@ -34,7 +34,7 @@ void display_patch_match_parameters(patchMatchParameterStruct *patchMatchParams)
 void initialise_inpainting(nTupleImage *imgIn, nTupleImage *occIn, featurePyramid featuresImgPyramid,
 					nTupleImage *shiftMap, patchMatchParameterStruct *patchMatchParams);
 
-void inpaint_image_wrapper(const char *fileIn,const char *fileOccIn, const char *fileOut,
+void inpaint_image_wrapper(const char *folderIn,const char *folderOut,
 			int patchSizeX, int patchSizeY, int nLevels=-1, bool useFeatures=false, bool verboseMode=false);
 float *inpaint_image_wrapper(float *inputImage, int nx, int ny, int nc,
 	float *inputOcc, int nOccx, int nOccy, int nOccc,

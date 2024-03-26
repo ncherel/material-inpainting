@@ -189,7 +189,10 @@ void copy_pixel_values_nTuple_image(nTupleImage *imgA, nTupleImage *imgB, int xA
 //copy nTupleValues from imgA(x1,y1) to imgB(x2,y2)
 void copy_pixel_values_nTuple_image(nTupleImage *imgA, nTupleImage *imgB, int x1, int y1, int x2, int y2);
 
-nTupleImage* copy_image_nTuple(nTupleImage *imgIn);
+nTupleImage *copy_image_nTuple(nTupleImage *imgIn);
+
+nTupleImage *concateTupleImage(std::initializer_list<nTupleImage *> images);
+void splitTupleImage(nTupleImage* imgOut, std::initializer_list<nTupleImage*> images);
 
 imageDataType calculate_residual(nTupleImage *imgIn, nTupleImage *imgInPrevious, nTupleImage *occIn);
 

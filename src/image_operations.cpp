@@ -38,11 +38,11 @@ std::string remove_extension_from_file(const char* fileIn)
 
 }
 
-float * read_image(const char *fileIn, size_t *nx, size_t *ny, size_t *nc)
+float * read_image(std::string fileIn, size_t *nx, size_t *ny, size_t *nc)
 {
 
 	float * pixel_stream = NULL;
-	pixel_stream = read_png_f32(fileIn,nx,ny,nc);
+	pixel_stream = read_png_f32(fileIn.c_str(),nx,ny,nc);
 
 	if (pixel_stream == NULL)
 	{
@@ -124,14 +124,14 @@ nTupleImage *make_colour_wheel()
 
 }
 
-void write_image(nTupleImage *imgIn, const char *fileName, imageDataType normalisationScalar)
+void write_image(nTupleImage *imgIn, std::string fileName, imageDataType normalisationScalar)
 {
 	int readWriteSuccess;
 
 		//remove extension from filename
 		//std::string fileWithoutExtension = remove_extension_from_file(fileName);
 		
-		const char* stringOut = fileName;
+	const char* stringOut = fileName.c_str();
 		
 		//write image
 		if (normalisationScalar>0)	//for better visulisation of results

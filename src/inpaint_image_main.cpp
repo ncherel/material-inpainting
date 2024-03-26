@@ -33,7 +33,7 @@ static void show_help();
 /// help on usage of inpainting code
 static void show_help() {
     std::cerr <<"\nNon-local patch-based image inpainting.\n"
-              << "Usage: " << " inpaint_image imgIn.png imgOccIn.png imgNameOut.png  [options]\n\n"
+              << "Usage: " << " inpaint_image folderIn folderOut  [options]\n\n"
               << "Options (default values in parentheses)\n"
               << "Patch size in x direction \n"
               << "    -patchSizeX : patch size in the x direction ("
@@ -69,21 +69,20 @@ int main(int argc, char* argv[])
 
 	time_t startTime,stopTime;
 		
-	if(argc < 3) {
+	if(argc < 2) {
         show_help();
         return -1;
     }
 
 	//get file names
-	const char *fileIn = argv[1];
-	const char *fileInOcc = argv[2];
-	const char *fileOut = argv[3];
+	const char *folderIn = argv[1];
+	const char *folderOut = argv[2];
 	
 	const char * patchSizeX;
 	const char * patchSizeY;
 	const char * nLevels;
-	const char * useFeatures = (argc >= 8) ? argv[7] : "1";
-	const char * verboseMode = (argc >= 9) ? argv[8] : "0";
+	const char * useFeatures = (argc >= 7) ? argv[8] : "1";
+	const char * verboseMode = (argc >= 8) ? argv[7] : "0";
 	
 	//show help
 	if(cmdOptionExists(argv, argv+argc, "-h"))
@@ -112,7 +111,7 @@ int main(int argc, char* argv[])
 	if(cmdOptionExists(argv, argv+argc, "-useFeatures"))
 		useFeatures = getCmdOption(argv, argv + argc, "-useFeatures");
 	else
-		useFeatures = "1";
+		useFeatures = "0";
 		
 	//whether to use texture features or not
 	if(cmdOptionExists(argv, argv+argc, "-v"))
@@ -123,7 +122,7 @@ int main(int argc, char* argv[])
 	
 	time(&startTime);//startTime = clock();
 	
-	inpaint_image_wrapper(fileIn,fileInOcc,fileOut,
+	inpaint_image_wrapper(folderIn, folderOut,
 		atoi(patchSizeX), atoi(patchSizeY), atoi(nLevels), (bool)atoi(useFeatures), (bool)atoi(verboseMode));
 	
 	time(&stopTime);
