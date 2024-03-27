@@ -8,6 +8,15 @@ The code is modified to perform the inpainting of materials using the following 
 - roughness
 - specular
 
+![Material inpainting with this method](inpainting_patch.png)
+
+## Usage
+
+Build with `make` and then use with:
+```
+./bin/inpaint_image folderIn folderOut
+```
+
 The code makes a lot of assumptions about the structure of the folders and the name of the files. Instead of pointing to a single file, you should provide the path of a folder `folderIn` which contains the following files:
 - `diffuse.png`
 - `normal.png`
